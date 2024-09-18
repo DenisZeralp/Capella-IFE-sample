@@ -1,0 +1,26 @@
+include:
+  - remote: https://raw.githubusercontent.com/DSD-DBS/capella-dockerimages/${CAPELLA_DOCKER_IMAGES_REVISION}/ci-templates/gitlab/diagram-cache.yml
+  - remote: https://raw.githubusercontent.com/DSD-DBS/py-capellambse/${CAPELLAMBSE_REVISION}/ci-templates/gitlab/model-badge.yml
+  - project: se-toolchain/capella-tools/rm-bridge/capella-polarion-mirror
+    ref: main
+    file: "/ci-templates/gitlab/synchronise_elements.yml"
+
+default:
+  tags:
+    - docker
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+generate-model-badge:
+  image: $DOCKER_REGISTRY/base
+
+variables:
+  CAPELLA_VERSION: 7.0.0
+  ENTRYPOINT: "In-Flight Entertainment System.aird"
+  CAPELLA2POLARION_PROJECT_ID: inflighttest
+  CAPELLA2POLARION_MODEL_JSON: '{"path": "In-Flight Entertainment System.aird", "diagram_cache": "./diagram_cache"}'
+  CAPELLA2POLARION_CONFIG: capella2polarion_config.yaml
+  CAPELLA2POLARION_DEBUG: 1
+  CAPELLAMBSE_PUSH_MODEL_BADGE: 0

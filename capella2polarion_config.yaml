@@ -1,0 +1,127 @@
+# Copyright DB Netz AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
+"*": # All layers
+  "*": # All class types
+    links:
+      - parent # Specify workitem links
+      - description_reference # Custom attribute
+  Class:
+    links:
+      - state_machines
+    serializer:
+      add_tree_diagram:
+        render_params: # All defaults
+          edgeRouting: POLYLINE
+          algorithm: LAYERED
+          direction: DOWN
+          partitioning: true
+          edgeLabelSide: SMART_DOWN
+  Diagram:
+    serializer: diagram
+    links:
+      - diagram_elements
+      - polarion_role: parent
+        capella_attr: target
+  Constraint:
+    serializer: linked_text_as_description
+
+sa:
+  SystemComponent:
+    - links:
+        - allocated_functions
+      serializer: add_context_diagram
+    - is_actor: true
+      polarion_type: systemActor
+    - is_actor: false
+      polarion_type: systemComponent
+  SystemFunction:
+    links:
+      - polarion_role: input_exchanges
+        capella_attr: inputs.exchanges
+        include:
+          Exchange items: exchange_items
+      - polarion_role: output_exchanges
+        capella_attr: outputs.exchanges
+        include:
+          Exchange items: exchange_items
+      - polarion_role: realized_functions
+        capella_attr: realized_functions
+    serializer:
+      add_context_diagram:
+        filters:
+          - SHOW_EX_ITEMS # functional exchange name and exchange item name
+  ComponentExchange:
+    links:
+      - allocated_functional_exchanges
+    serializer: add_context_diagram
+  FunctionalExchange:
+    links:
+      - exchange_items
+  ExchangeItem:
+  Capability:
+    polarion_type: systemCapability
+    serializer:
+      include_pre_and_post_condition:
+      add_context_diagram:
+        render_params:
+          display_symbols_as_boxes: true
+    links:
+      - involved_functions
+      - constraints
+  FunctionalChain:
+    polarion_type: functionalChain
+    links:
+      - polarion_role: involves
+        capella_attr: involved_functions
+        link_field: involved_functions
+
+la:
+  LogicalComponent:
+    - serializer:
+        add_context_diagram:
+          render_params:
+            display_parent_relation: true
+            include_inner_objects: true
+    - links:
+        - allocated_functions
+    - is_actor: true
+      polarion_type: logicalActor
+    - is_actor: false
+      polarion_type: logicalComponent
+  CapabilityRealization:
+    serializer: include_pre_and_post_condition
+    links:
+      - constraints
+  LogicalFunction:
+    polarion_type: logicalFunction
+    serializer:
+      add_context_diagram:
+        filters:
+          - SHOW_EX_ITEMS
+    links:
+      - polarion_role: input_exchanges
+        capella_attr: inputs.exchanges
+        include:
+          Exchange Items: exchange_items
+      - polarion_role: output_exchanges
+        capella_attr: outputs.exchanges
+        include:
+          Exchange Items: exchange_items
+      - realized_functions
+  ComponentExchange:
+    polarion_type: logicalComponentExchange
+    serializer: add_context_diagram
+    links:
+      - allocated_functional_exchanges
+  FunctionalExchange:
+    polarion_type: logicalFunctionalExchange
+    links:
+      - exchange_items
+  ExchangeItem:
+  FunctionalChain:
+    polarion_type: functionalChain
+    links:
+      - polarion_role: involves
+        capella_attr: involved_functions
+        link_field: involved_functions
