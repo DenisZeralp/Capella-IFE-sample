@@ -1,0 +1,21 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'logical-common.html.j2' import render_content %}
+
+{% set component = model.by_uuid(uuid) %}
+{{ heading(1, component.name, session) }}
+{{ heading(2, "Table of Content", session) }}
+<div id="polarion_wiki macro name=toc"></div>
+<div id="polarion_wiki macro name=page_break" contentEditable="false" data-is-landscape="false"></div>
+{{ heading(2, "Introduction", session)}}
+<p>
+This Document focuses on the interfaces connecting the logical
+component and its allocated functions. It outlines how inputs and outputs
+flow between these functions through functional exchanges, allocated
+to their interface. Additionally, the document covers exchanged items that are
+allocated to both the interfaces and the functional exchanges, describing the
+data interactions within the system.
+</p>
+{{ render_content(component, model, session) }}

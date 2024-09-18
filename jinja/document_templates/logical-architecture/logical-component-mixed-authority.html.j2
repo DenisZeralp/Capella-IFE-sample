@@ -1,0 +1,10 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'logical-common.html.j2' import render_content %}
+
+{% for uuid in uuids %}
+{% set component = model.by_uuid(uuid) %}
+{{ render_content(component, model, session) }}
+{% endfor %}

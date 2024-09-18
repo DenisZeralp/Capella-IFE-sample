@@ -1,0 +1,19 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
+{% from 'icd-interfaces-common.html.j2' import render_content %}
+
+{% set physical_link = model.by_uuid(physical_link) %}
+{{ heading(1, "Interface " + physical_link.name, session)}}
+{{ heading(2, "Table of Content", session)}}
+<div id="polarion_wiki macro name=toc"></div>
+<div id="polarion_wiki macro name=page_break" contentEditable="false" data-is-landscape="false"></div>
+{{ heading(2, "Introduction", session)}}
+<p>
+This Interface Control Document only covers software message based communication (application layer) between compatible components.
+At the moment physical interface definition is not in scope for this document.
+The scope of the document covers Interface Requirements and Definition
+</p>
+{{ render_content(physical_link, model, session) }}

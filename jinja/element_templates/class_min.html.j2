@@ -1,0 +1,14 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name, linked_name_with_icon, description, display_property_label %}
+{% from 'polarion_props.j2' import table_attributes, th_attributes, td_attributes %}
+
+<p>Parent: <a href="{{ object.parent | make_href }}">{{ object.parent.name }}</a></p>
+{% if object.description %}
+<p>{{ object.description }}</p>
+{% else %}
+<p style="color:red">No description available.</p>
+{% endif %}

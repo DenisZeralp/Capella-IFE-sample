@@ -1,0 +1,212 @@
+# Copyright DB Netz AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
+"*": # All layers
+  "*": # All class types
+    links:
+      - parent # Specify workitem links
+      - description_reference # Custom attribute
+  Class:
+    links:
+      - state_machines
+    serializer:
+      add_tree_diagram:
+        render_params: # All defaults
+          edgeRouting: POLYLINE
+          algorithm: layered
+          direction: DOWN
+          partitioning: true
+          edgeLabelSide: SMART_DOWN
+  Diagram:
+    serializer: diagram
+    links:
+      - diagram_elements
+      - polarion_role: parent
+        capella_attr: target
+  Constraint:
+    serializer: linked_text_as_description
+
+sa:
+  SystemComponent:
+    - links:
+        - allocated_functions
+      serializer: add_context_diagram
+    - is_actor: true
+      polarion_type: systemActor
+    - is_actor: false
+      polarion_type: systemComponent
+  SystemFunction:
+    links:
+      - polarion_role: input_exchanges
+        capella_attr: inputs.exchanges
+        include:
+          Exchange items: exchange_items
+      - polarion_role: output_exchanges
+        capella_attr: outputs.exchanges
+        include:
+          Exchange items: exchange_items
+      - polarion_role: realized_functions
+        capella_attr: realized_functions
+    serializer:
+      add_context_diagram:
+        filters:
+          - SHOW_EX_ITEMS # functional exchange name and exchange item name
+  ComponentExchange:
+    links:
+      - allocated_functional_exchanges
+    serializer:
+      jinja_as_description:
+        template_folder: jinja/element_templates
+        template_path: component_exchange.html.j2
+      add_context_diagram:
+        filters:
+          - SHOW_EX_ITEMS
+  FunctionalExchange:
+    links:
+      - exchange_items
+  ExchangeItem:
+  Capability:
+    polarion_type: systemCapability
+    serializer:
+      include_pre_and_post_condition:
+      add_context_diagram:
+        render_params:
+          display_symbols_as_boxes: true
+    links:
+      - involved_functions
+      - constraints
+  FunctionalChain:
+    polarion_type: functionalChain
+    links:
+      - polarion_role: involves
+        capella_attr: involved_functions
+        link_field: involved_functions
+
+la:
+  LogicalComponent:
+    - links:
+        - allocated_functions
+      serializer:
+        jinja_as_description:
+          template_folder: jinja/element_templates
+          template_path: logical_component.html.j2
+        add_context_diagram:
+          filters:
+            - SHOW_EX_ITEMS
+    - is_actor: true
+      polarion_type: logicalActor
+    - is_actor: false
+      polarion_type: logicalComponent
+  CapabilityRealization:
+    serializer: include_pre_and_post_condition
+    links:
+      - constraints
+  LogicalFunction:
+    polarion_type: logicalFunction
+    serializer:
+      add_context_diagram:
+        filters:
+          - SHOW_EX_ITEMS
+    links:
+      - polarion_role: input_exchanges
+        capella_attr: inputs.exchanges
+        include:
+          Exchange Items: exchange_items
+      - polarion_role: output_exchanges
+        capella_attr: outputs.exchanges
+        include:
+          Exchange Items: exchange_items
+      - realized_functions
+  ComponentExchange:
+    serializer:
+      jinja_as_description:
+        template_folder: jinja/element_templates
+        template_path: component_exchange.html.j2
+      add_context_diagram:
+        filters:
+          - SHOW_EX_ITEMS
+    links:
+      - allocated_functional_exchanges
+  FunctionalExchange:
+    links:
+      - exchange_items
+  ExchangeItem:
+  FunctionalChain:
+    polarion_type: functionalChain
+    links:
+      - polarion_role: involves
+        capella_attr: involved_functions
+        link_field: involved_functions
+
+pa:
+  ComponentExchange:
+    links:
+      - allocated_functional_exchanges
+      - exchange_items
+      - polarion_role: physical_links
+        capella_attr: allocating_physical_link
+    serializer:
+      jinja_as_description:
+        template_folder: jinja/element_templates
+        template_path: component_exchange.html.j2
+      add_context_diagram:
+        filters:
+          - SHOW_EX_ITEMS
+  FunctionalExchange:
+    links:
+      - exchange_items
+  PhysicalComponent:
+    - links:
+        - allocated_functions
+      serializer: add_context_diagram
+    - is_actor: false
+      nature: UNSET
+      polarion_type: physicalComponent
+    - is_actor: false
+      nature: NODE
+      polarion_type: physicalComponentNode
+      links:
+        - polarion_role: physical_links
+          capella_attr: physical_ports.links
+    - is_actor: false
+      nature: BEHAVIOR
+      polarion_type: physicalComponentBehavior
+      links:
+        - polarion_role: exchanges
+          capella_attr: related_exchanges
+    - is_actor: true
+      polarion_type: physicalActor
+      links:
+        - polarion_role: physical_links
+          capella_attr: physical_ports.links
+        - polarion_role: exchanges
+          capella_attr: related_exchanges
+  PhysicalFunction:
+    serializer: add_context_diagram
+    links:
+      - polarion_role: input_exchanges
+        capella_attr: inputs.exchanges
+      - polarion_role: output_exchanges
+        capella_attr: outputs.exchanges
+  PhysicalPath:
+  PhysicalLink:
+    serializer: add_context_diagram
+  ExchangeItem:
+    serializer:
+      jinja_as_description:
+        template_folder: jinja/element_templates
+        template_path: exchange_item.html.j2
+  DataPkg:
+  Class:
+    links:
+      - state_machines
+    serializer:
+      add_tree_diagram:
+      jinja_as_description:
+        template_folder: jinja/element_templates
+        template_path: class.html.j2
+  Property:
+    serializer:
+      jinja_as_description:
+        template_folder: jinja/element_templates
+        template_path: class_property.html.j2

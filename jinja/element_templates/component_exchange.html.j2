@@ -1,0 +1,50 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
+{% from 'common_macros.html.j2' import linked_name_with_icon %}
+{% from 'polarion_props.j2' import table_attributes, th_attributes, td_attributes %}
+
+{% macro describe_exchange(object) %}
+{%- set source_function = object.source.owner -%}
+{%- set target_function = object.target.owner -%}
+{%- set source = source_function.owner -%}
+{%- set target = target_function.owner -%}
+The {{ linked_name_with_icon(source) | safe }} shall provide {{ linked_name_with_icon(object) | safe }} to {{ linked_name_with_icon(target) | safe }} so that the {{ linked_name_with_icon(target) | safe }} could {{ linked_name_with_icon(target_function) | safe }}.
+{% endmacro %}
+
+<span style="font-weight: bold;font-size: 12pt;line-height: 1.5;">Interface Partners</span>
+<p>This logical interface connects between {{ linked_name_with_icon(object.source.owner) | safe}} and {{ linked_name_with_icon(object.target.owner) | safe}}.</p>
+<p>The need for the interface is explained and requirements are provided so that the interface partners could find an appropriate interface definition (solution).</p>
+<span style="font-weight: bold;font-size: 12pt;line-height: 1.5;">Enabled interactions</span>
+<p>This interface enables the following interactions:</p>
+<table {{table_attributes}}>
+    <thead>
+        <tr>
+            <th {{th_attributes}}>ID</th>
+            <th {{th_attributes}}>Interaction description</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for exchange in object.allocated_functional_exchanges %}
+        <tr>
+            <td {{td_attributes}}>{{ linked_name_with_icon(exchange) | safe }}</td>
+            <td {{td_attributes}}>
+                {{ describe_exchange(exchange) | safe }}
+                {% if exchange.exchange_items | length > 1 %}
+                <p>{{ exchange.name }} is further specified via the following Exchange Items:</p>
+                <ul>
+                    {% for item in exchange.exchange_items %}
+                    <li>{{ linked_name_with_icon(item) | safe }}</li>
+                    {% endfor %}
+                </ul>
+                {% elif exchange.exchange_items %}
+                <p>This interaction is further specified via {{ linked_name_with_icon(exchange.exchange_items[0]) | safe}}.</p>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
