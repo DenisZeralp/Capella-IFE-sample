@@ -1,0 +1,10 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
+<p>Test content</p>
+{{ heading(3, "Several Items", session)}}
+{% for item in items %}
+{{ insert_work_item(model.by_uuid(item), session) }}
+{% endfor %}

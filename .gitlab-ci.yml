@@ -28,6 +28,9 @@ variables:
   CAPELLA2POLARION_DEBUG: 1
   CAPELLA2POLARION_FORCE_UPDATE: 0
   CAPELLAMBSE_PUSH_MODEL_BADGE: 0
+  CAPELLA2POLARION_DOCUMENT_CONFIG: capella2polarion_document_config.yaml.j2
+  CAPELLA2POLARION_OVERWRITE_LAYOUTS: 1
+  CAPELLA2POLARION_OVERWRITE_NUMBERING: 1
 
 capella2polarion_synchronise_elements:
   needs:
@@ -47,3 +50,20 @@ capella2polarion_synchronise_elements:
         $([[ $CAPELLA2POLARION_FORCE_UPDATE -eq 1 ]] && echo '--force-update') \
         ${CAPELLA2POLARION_TYPE_PREFIX:+--type-prefix="$CAPELLA2POLARION_TYPE_PREFIX"} \
         ${CAPELLA2POLARION_ROLE_PREFIX:+--role-prefix="$CAPELLA2POLARION_ROLE_PREFIX"}
+
+capella2polarion_render_documents:
+  needs:
+    - job: capella2polarion_synchronise_elements
+
+  script:
+    - pip install git+https://github.com/DSD-DBS/capella-polarion@capellambse-v0.6
+    - >
+      python \
+        -m capella2polarion \
+        $([[ $CAPELLA2POLARION_DEBUG -eq 1 ]] && echo '--debug') \
+        --polarion-project-id=${CAPELLA2POLARION_PROJECT_ID:?} \
+        --capella-model="${CAPELLA2POLARION_MODEL_JSON:?}" \
+        render-documents \
+        $([[ $CAPELLA2POLARION_OVERWRITE_LAYOUTS -eq 1 ]] && echo '--overwrite-layouts') \
+        $([[ $CAPELLA2POLARION_OVERWRITE_NUMBERING -eq 1 ]] && echo '--overwrite-numbering') \
+        --document-rendering-config="${CAPELLA2POLARION_DOCUMENT_CONFIG:?}"

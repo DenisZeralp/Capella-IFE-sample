@@ -223,7 +223,7 @@
         {% endif %}
         {% if type %}
             {% if type.__class__.__name__ == "Enumeration" %}
-                {{ type.name | safe }} 
+                {{ type.name | safe }}
                 {%- if type.domain_type -%}
                     <span> ({{type.domain_type.name | safe }})</span>
                 {%- else -%}

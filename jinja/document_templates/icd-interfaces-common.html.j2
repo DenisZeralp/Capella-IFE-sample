@@ -1,0 +1,156 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
+{% set table_attributes='class="polarion-Document-table" style="margin: auto;margin-left: 0px;empty-cells: show;border-collapse: collapse;max-width: 1280px;border: 1px solid #CCCCCC;"' %}
+{% set th_attributes='style="height: 12px;text-align: left;vertical-align: top;font-weight: bold;background-color: #F0F0F0;border: 1px solid #CCCCCC;padding: 5px;"' %}
+{% set td_attributes='style="height: 12px;text-align: left;vertical-align: top;line-height: 18px;border: 1px solid #CCCCCC;padding: 5px;"' %}
+
+{% macro add_class_dependencies(cls, classes) %}
+    {% if cls and cls.xtype == "org.polarsys.capella.core.data.information:Class" and not cls in classes %}
+        {% set _none = classes.append(cls) %}
+        {% if cls.super %}
+            {{ add_class_dependencies(cls.super, classes) }}
+        {% endif %}
+        {% for property in cls.properties %}
+            {% set type = None %}
+            {% if "type" in property.__dir__() %}
+                {% set type = property.type %}
+            {% elif "abstract_type" in property.__dir__() %}
+                {% set type = property.abstract_type %}
+            {% endif %}
+            {{ add_class_dependencies(type, classes) }}
+        {% endfor %}
+    {% endif %}
+{% endmacro %}
+
+{% macro render_content(physical_link, model, session) %}
+    {% set component_exchanges = physical_link.exchanges %}
+    {% set component_exchanges_components = (component_exchanges.map("source.owner") + component_exchanges.map("target.owner")) | reject("in", physical_link.ends.map("owner")) | unique(attribute="uuid") %}
+
+    {{ heading(2, "Interface Partners", session)}}
+    <workitem id="interface_partners">The scope of this interface document is the following link:</workitem>
+    {{ insert_work_item(physical_link, session) }}
+    {{ heading(3, "Partner A", session) }}
+    {{ insert_work_item(physical_link.source.owner, session) }}
+    {% for component in physical_link.source.owner.components | unique(attribute="uuid") %}
+        {% if component in component_exchanges_components %}
+            {{ insert_work_item(component, session, 1) }}
+        {% endif %}
+    {% endfor %}
+    {{ heading(3, "Partner B", session) }}
+    {{ insert_work_item(physical_link.target.owner, session) }}
+    {% for component in physical_link.source.owner.components | unique(attribute="uuid") %}
+        {% if component in component_exchanges_components %}
+            {{ insert_work_item(component, session, 1) }}
+        {% endif %}
+    {% endfor %}
+    {{ heading(3, "Exchange Item Allocation", session) }}
+    {% set exchange_items_by_direction = {} %}
+    {% set interfaces = {} %}
+    {% for component_exchange in component_exchanges %}
+        {% set provided_exchange_items_a = (component_exchange.source.provided_interfaces.map("exchange_item_allocations.item") + component_exchange.target.required_interfaces.map("exchange_item_allocations.item")) | list %}
+        {% set provided_exchange_items_b = (component_exchange.target.provided_interfaces.map("exchange_item_allocations.item") + component_exchange.source.required_interfaces.map("exchange_item_allocations.item")) | list %}
+        {% set component_a_b = (component_exchange.source.owner.uuid, component_exchange.target.owner.uuid) %}
+        {% set component_b_a = (component_exchange.target.owner.uuid, component_exchange.source.owner.uuid) %}
+        {% set _ = exchange_items_by_direction.update({component_a_b: exchange_items_by_direction.get(component_a_b, []) + provided_exchange_items_a}) %}
+        {% set _ = exchange_items_by_direction.update({component_b_a: exchange_items_by_direction.get(component_b_a, []) + provided_exchange_items_b}) %}
+    {% endfor %}
+    <workitem id="exchange_item_allocation">
+        <table {{table_attributes}}>
+            <tbody>
+                <tr>
+                    <th {{th_attributes}}>Exchange Item</th>
+                    <th {{th_attributes}}>Source</th>
+                    <th {{th_attributes}}>Target</th>
+                    <th {{th_attributes}}>Type</th>
+                    <th {{th_attributes}}>Message Rate</th>
+                    <th {{th_attributes}}>Safety Relevant</th>
+                </tr>
+                {% for direction, exchange_items in exchange_items_by_direction.items() %}
+                    {% for ei in exchange_items | unique(attribute="uuid") %}
+                        <tr>
+                            <td {{td_attributes}}>{{ ei | link_work_item }}</td>
+                            <td {{td_attributes}}>{{ model.by_uuid(direction[0]) | link_work_item }}</td>
+                            <td {{td_attributes}}>{{ model.by_uuid(direction[1]) | link_work_item }}</td>
+                            <td {{td_attributes}}>{{ ei.type }}</td>
+                            <td {{td_attributes}}>
+                                {% set message_rate = ei.property_value_groups.map("property_values") | selectattr("name", "equalto", "message rate") | first %}
+                                {% if message_rate %}
+                                    {% set unit = message_rate.applied_property_values.map("property_values") | selectattr("name", "equalto", "__UNIT__") | first %}
+                                    {{ message_rate.value }}{% if unit %} {{unit.value}}{% endif %}
+                                {% endif %}
+                            </td>
+                            <td {{td_attributes}}>
+                                {% set message_rate = ei.property_value_groups.map("property_values") | selectattr("name", "equalto", "safety relevant") | first %}
+                                {% if message_rate %}
+                                    {{ message_rate.value }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </workitem>
+    {{ heading(2, "Interface Definition", session)}}
+    {{ heading(3, "Message Catalog", session)}}
+    <workitem id="message_catalog">This section identifies messages used within the interface.</workitem>
+    {%- set classes = {} -%}
+    {%- set inserted = [] -%}
+    {% for direction, eis in exchange_items_by_direction.items() %}
+        {% set _ = classes.setdefault(direction, []) %}
+        {{ heading(4, model.by_uuid(direction[0]).name + " → " + model.by_uuid(direction[1]).name, session) }}
+        {% for ei in eis | unique(attribute="uuid") %}
+            {{ heading(5, work_item_field(ei, "id") + " - " + ei.name, session) }}
+            {{ insert_work_item(ei, session) }}
+            {% for el in ei.elements %}
+                {{ add_class_dependencies(el.abstract_type, classes[direction]) }}
+            {% endfor %}
+        {% else %}
+        <workitem id="ei-{{ direction[0] }}>>>{{ direction[1] }}-empty">
+            There is no data defined for this direction.
+        </workitem>
+        {% endfor %}
+    {% endfor %}
+    {{ heading(3, "Message Description", session)}}
+    <workitem id="message_description">This section provides a detailed description of each message used within the interface.</workitem>
+    {% set object_count = {} %}
+
+    {% for direction, objects in classes.items() %}
+        {% for obj in objects | unique(attribute="uuid") %}
+        {% set _ = object_count.setdefault(obj.uuid, 0) %}
+        {% set _ = object_count.update({obj.uuid: object_count[obj.uuid] + 1}) %}
+        {% endfor %}
+    {% endfor %}
+
+    {% set multi_dir_clss = [] %}
+    {% for uuid, count in object_count.items() %}
+        {% if count > 1 %}
+            {% set _ = multi_dir_clss.append(uuid) %}
+        {% endif %}
+    {% endfor %}
+    {% if multi_dir_clss %}
+    {{ heading(4, "Generic Messages", session) }}
+    <workitem id="messages_generic">The following classes are used in multiple directions.</workitem>
+    {% for uuid in multi_dir_clss | unique %}
+        {% set cl = model.by_uuid(uuid) %}
+        {{ heading(5, work_item_field(cl, "id") + " - " + cl.name, session) }}
+        {{ insert_work_item(cl, session) }}
+    {% endfor %}
+    {%endif%}
+    {% for direction, clss in classes.items() %}
+        {{ heading(4, model.by_uuid(direction[0]).name + " → " + model.by_uuid(direction[1]).name, session) }}
+        {% for cl in clss | unique(attribute="uuid") %}
+            {% if cl.uuid not in multi_dir_clss %}
+                {{ heading(5, work_item_field(cl, "id") + " - " + cl.name, session) }}
+                {{ insert_work_item(cl, session) }}
+            {%endif%}
+        {% else %}
+            <workitem id="cls-{{ direction[0] }}>>>{{ direction[1] }}-empty">
+                There is no data defined for this direction.
+            </workitem>
+        {% endfor %}
+    {% endfor %}
+{% endmacro %}

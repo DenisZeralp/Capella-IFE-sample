@@ -1,3 +1,8 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
 {% from 'common_macros.html.j2' import show_other_attributes, linked_name, linked_name_with_icon, description, display_property %}
 <p>Parent: {{ linked_name_with_icon(object.parent) | safe}}</p>
 {{ display_property(object, object.parent) }}
