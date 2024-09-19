@@ -13,7 +13,7 @@
       add_tree_diagram:
         render_params: # All defaults
           edgeRouting: POLYLINE
-          algorithm: LAYERED
+          algorithm: layered
           direction: DOWN
           partitioning: true
           edgeLabelSide: SMART_DOWN
@@ -121,3 +121,70 @@ la:
       - polarion_role: involves
         capella_attr: involved_functions
         link_field: involved_functions
+
+pa:
+  ComponentExchange:
+    links:
+      - allocated_functional_exchanges
+      - exchange_items
+      - polarion_role: physical_links
+        capella_attr: allocating_physical_link
+    serializer: add_context_diagram
+  FunctionalExchange:
+    links:
+      - exchange_items
+  PhysicalComponent:
+    - links:
+        - allocated_functions
+      serializer: add_context_diagram
+    - is_actor: false
+      nature: UNSET
+      polarion_type: physicalComponent
+    - is_actor: false
+      nature: NODE
+      polarion_type: physicalComponentNode
+      links:
+        - polarion_role: physical_links
+          capella_attr: physical_ports.links
+    - is_actor: false
+      nature: BEHAVIOR
+      polarion_type: physicalComponentBehavior
+      links:
+        - polarion_role: exchanges
+          capella_attr: related_exchanges
+    - is_actor: true
+      polarion_type: physicalActor
+      links:
+        - polarion_role: physical_links
+          capella_attr: physical_ports.links
+        - polarion_role: exchanges
+          capella_attr: related_exchanges
+  PhysicalFunction:
+    serializer: add_context_diagram
+    links:
+      - polarion_role: input_exchanges
+        capella_attr: inputs.exchanges
+      - polarion_role: output_exchanges
+        capella_attr: outputs.exchanges
+  PhysicalPath:
+  PhysicalLink:
+    serializer: add_context_diagram
+  ExchangeItem:
+    serializer:
+      jinja_as_description:
+        template_folder: jinja/element_templates
+        template_path: exchange_item.html.j2
+  DataPkg:
+  Class:
+    links:
+      - state_machines
+    serializer:
+      add_tree_diagram:
+      jinja_as_description:
+        template_folder: jinja/element_templates
+        template_path: class.html.j2
+  Property:
+    serializer:
+      jinja_as_description:
+        template_folder: jinja/element_templates
+        template_path: class_property.html.j2

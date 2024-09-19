@@ -1,0 +1,38 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name, linked_name_with_icon, description, display_property %}
+{% from 'polarion_props.j2' import table_attributes, th_attributes, td_attributes %}
+{% macro get_value(prop) %}
+    {% set unit = prop.applied_property_values.map("property_values") | selectattr("name", "equalto", "__UNIT__") | first %}
+    {{ prop.value }}{% if unit %} {{unit.value}}{% endif %}
+{% endmacro %}
+
+{% macro properties_list(props, obj) %}
+    {% for property in props %}
+        {{ display_property(property, obj, True) | safe }}
+    {% endfor %}
+{% endmacro %}
+
+{% if object.description %}
+<p>{{ object.description }}</p>
+{% else %}
+<p style="color:red">No description available.</p>
+{% endif %}
+
+{% set props = [] %}
+{% if object.super %}
+    {% set props = props | list + object.super.properties | list %}
+{% endif %}
+{% set props = props + object.owned_properties | list %}
+
+<span style="font-weight: bold;font-size: 12pt;line-height: 1.5;">Properties</span>
+<br>
+{% if props %}
+    <p>The object owns the properties listed below; We use the following format to describe property: name : type [min .. max (instances of type)] or [ fixed number]; if no multiplicity is shown assume its 1 (single instance).</p>
+    {{ properties_list(props, object) | safe }}
+{% else %}
+    <p style="color:red">No properties are owned by this object.</p>
+{% endif %}
