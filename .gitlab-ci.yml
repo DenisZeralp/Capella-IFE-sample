@@ -4,9 +4,9 @@
 include:
   - remote: https://raw.githubusercontent.com/DSD-DBS/capella-dockerimages/${CAPELLA_DOCKER_IMAGES_REVISION}/ci-templates/gitlab/diagram-cache.yml
   - remote: https://raw.githubusercontent.com/DSD-DBS/py-capellambse/${CAPELLAMBSE_REVISION}/ci-templates/gitlab/model-badge.yml
-  - project: se-toolchain/capella-tools/rm-bridge/capella-polarion-mirror
-    ref: main
-    file: "/ci-templates/gitlab/synchronise_elements.yml"
+  # - project: se-toolchain/capella-tools/rm-bridge/capella-polarion-mirror
+  #   ref: main
+  #   file: "/ci-templates/gitlab/synchronise_elements.yml"
 
 default:
   tags:
@@ -28,3 +28,22 @@ variables:
   CAPELLA2POLARION_DEBUG: 1
   CAPELLA2POLARION_FORCE_UPDATE: 0
   CAPELLAMBSE_PUSH_MODEL_BADGE: 0
+
+capella2polarion_synchronise_elements:
+  needs:
+    - job: update_capella_diagram_cache
+      artifacts: true
+
+  script:
+    - pip install git+https://github.com/DSD-DBS/capella-polarion@capellambse-v0.6
+    - >
+      python \
+        -m capella2polarion \
+        $([[ $CAPELLA2POLARION_DEBUG -eq 1 ]] && echo '--debug') \
+        --polarion-project-id=${CAPELLA2POLARION_PROJECT_ID:?} \
+        --capella-model="${CAPELLA2POLARION_MODEL_JSON:?}" \
+        synchronize \
+        --synchronize-config=${CAPELLA2POLARION_CONFIG:?} \
+        $([[ $CAPELLA2POLARION_FORCE_UPDATE -eq 1 ]] && echo '--force-update') \
+        ${CAPELLA2POLARION_TYPE_PREFIX:+--type-prefix="$CAPELLA2POLARION_TYPE_PREFIX"} \
+        ${CAPELLA2POLARION_ROLE_PREFIX:+--role-prefix="$CAPELLA2POLARION_ROLE_PREFIX"}
