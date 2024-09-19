@@ -78,13 +78,9 @@ sa:
 
 la:
   LogicalComponent:
-    - serializer:
-        add_context_diagram:
-          render_params:
-            display_parent_relation: true
-            include_inner_objects: true
     - links:
         - allocated_functions
+      serializer: add_context_diagram
     - is_actor: true
       polarion_type: logicalActor
     - is_actor: false

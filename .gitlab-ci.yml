@@ -26,4 +26,5 @@ variables:
   CAPELLA2POLARION_MODEL_JSON: '{"path": "In-Flight Entertainment System.aird", "diagram_cache": "./diagram_cache"}'
   CAPELLA2POLARION_CONFIG: capella2polarion_config.yaml
   CAPELLA2POLARION_DEBUG: 1
+  CAPELLA2POLARION_FORCE_UPDATE: 0
   CAPELLAMBSE_PUSH_MODEL_BADGE: 0
