@@ -3,7 +3,11 @@
 
 full_authority:
   - template_directory: jinja/document_templates
-    template: icd-interfaces-full_auth.html.j2
+    template: icd-interfaces-full_authority.html.j2
+    project_id: null # None -> Defaults to Sync Project
+    status_allow_list:
+      - draft
+      - open
     heading_numbering: True
     work_item_layouts:
       componentExchange:
@@ -45,7 +49,7 @@ full_authority:
     {%- endif -%}
     {% endfor %}
   - template_directory: jinja/document_templates/logical-architecture
-    template: logical-component.html.j2
+    template: logical-component-full-authority.html.j2
     heading_numbering: True
     work_item_layouts:
       logicalComponent:

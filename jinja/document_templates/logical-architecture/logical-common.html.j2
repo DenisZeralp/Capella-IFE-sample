@@ -10,7 +10,7 @@
 {% macro render_content(component, model, session) %}
     {{ heading(2, component.name, session)}}
     {{ heading(3, "Logical Component Context", session)}}
-    <workitem id="interface_partners">The figure below provides an overview of the logical subsystem and external entities that either require the functionality of <b>{{ object.name }}</b> (expect outputs) or enable it (provide inputs). The figure also identifies the interfaces between the subsystem and its environment.</workitem>
+    <workitem id="interface_partners">The figure below provides an overview of the logical subsystem and external entities that either require the functionality of <b>{{ component.name }}</b> (expect outputs) or enable it (provide inputs). The figure also identifies the interfaces between the subsystem and its environment.</workitem>
     {{ insert_work_item(component, session) }}
     {{ heading(3, "Logical interface partners of " + component.name, session) }}
 

@@ -1,0 +1,9 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
+{% from 'icd-interfaces-common.html.j2' import render_content %}
+
+{% set physical_link = model.by_uuid(physical_link) %}
+{{ render_content(physical_link, model, session) }}
