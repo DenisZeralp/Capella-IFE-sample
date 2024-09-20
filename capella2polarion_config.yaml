@@ -106,12 +106,10 @@ la:
           Exchange Items: exchange_items
       - realized_functions
   ComponentExchange:
-    polarion_type: logicalComponentExchange
     serializer: add_context_diagram
     links:
       - allocated_functional_exchanges
   FunctionalExchange:
-    polarion_type: logicalFunctionalExchange
     links:
       - exchange_items
   ExchangeItem:
