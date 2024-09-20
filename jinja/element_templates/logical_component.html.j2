@@ -5,15 +5,13 @@
 
 {% from 'common_macros.html.j2' import show_other_attributes, description %}
 
-<h1>{{ object.name }}</h1>
-
 {{ description(object) | safe }}
 
 <p>
 The figure below provides an overview of the logical subsystem and external entities that either require the functionality of <b>{{ object.name }}</b> (expect outputs) or enable it (provide inputs). The figure also identifies the interfaces between the subsystem and its environment.
 </p>
 
-{{- object.context_diagram.as_svg | safe -}}
+{{- object.context_diagram.as_html_img | safe -}}
 
 
 {%- for fnc in object.allocated_functions -%}

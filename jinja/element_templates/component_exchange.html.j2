@@ -14,13 +14,12 @@
 The {{ source | link_work_item }} shall provide {{ object | link_work_item }} to {{ target | link_work_item }} so that the {{ target | link_work_item }} could {{ target_function | link_work_item }}.
 {% endmacro %}
 
-<h1>Logical Interface {{ object.name }}</h1>
-<h2>Interface Partners</h2>
+<span style="font-weight: bold;font-size: 12pt;line-height: 1.5;">Interface Partners</span>
 <p>This logical interface connects between {{ object.source.owner | link_work_item}} and {{ object.target.owner | link_work_item}}.</p>
 <p>The need for the interface is explained and requirements are provided so that the interface partners could find an appropriate interface definition (solution).</p>
 <h2>Enabled interactions</h2>
 <p>The figure below provides an overview of the behaviors that depend on this interface:</p>
-{{ object.context_diagram.as_svg | safe }}
+{{ object.context_diagram.as_html_img | safe }}
 <p>This interface enables the following interactions:</p>
 <table {{table_attributes}}>
     <thead>
