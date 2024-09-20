@@ -80,7 +80,13 @@ la:
   LogicalComponent:
     - links:
         - allocated_functions
-      serializer: add_context_diagram
+      serializer:
+        jinja_as_description:
+          template_folder: jinja/element_templates
+          template_path: logical_component.html.j2
+        add_context_diagram:
+          filters:
+            - SHOW_EX_ITEMS
     - is_actor: true
       polarion_type: logicalActor
     - is_actor: false
@@ -106,7 +112,13 @@ la:
           Exchange Items: exchange_items
       - realized_functions
   ComponentExchange:
-    serializer: add_context_diagram
+    serializer:
+      jinja_as_description:
+        template_folder: jinja/element_templates
+        template_path: component_exchange.html.j2
+      add_context_diagram:
+        filters:
+          - SHOW_EX_ITEMS
     links:
       - allocated_functional_exchanges
   FunctionalExchange:
