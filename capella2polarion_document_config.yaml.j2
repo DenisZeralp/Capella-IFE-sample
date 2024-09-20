@@ -5,9 +5,9 @@ full_authority:
   - template_directory: jinja/document_templates
     template: icd-interfaces-full_authority.html.j2
     project_id: null # None -> Defaults to Sync Project
-    status_allow_list:
+    {# status_allow_list: # Only overwrite content when document has this status
       - draft
-      - open
+      - open #}
     heading_numbering: True
     work_item_layouts:
       componentExchange:
@@ -65,10 +65,6 @@ full_authority:
           - context_diagram
           - allocated_functional_exchanges
           - exchange_items
-      class:
-        show_title: False
-        fields_at_end:
-          - tree_view
       exchangeItem:
         show_title: False
     instances:
@@ -79,39 +75,38 @@ full_authority:
       params:
         uuid: {{ cmp.uuid }}
     {% endfor %}
-{# mixed_authority:
+
+mixed_authority:
   - template_directory: jinja/document_templates
     heading_numbering: True
-    project_id: PROJECT_ID
+    project_id: null
     work_item_layouts:
       text:
         show_title: False
-      physicalLink:
+      logicalComponent:
         fields_at_start:
           - id
-      physicalActor:
-        fields_at_start:
-          - id
-      physicalComponentActor:
-        fields_at_start:
-          - id
-      physicalComponentNode:
-        fields_at_start:
-          - id
-      physicalComponentBehavior:
-        fields_at_start:
-          - id
-      class:
-        show_title: False
         fields_at_end:
-          - tree_view
+          - context_diagram
+          - allocated_functions
+      componentExchange:
+        fields_at_start:
+          - id
+        fields_at_end:
+          - context_diagram
+          - allocated_functional_exchanges
+          - exchange_items
       exchangeItem:
         show_title: False
     sections:
-      IcdContent: icd-interfaces-mixed_authority.html.j2
+      Content: logical-component-mixed-authority.html.j2
     instances:
       - polarion_space: _default
-        polarion_name: NAME
-        polarion_title: TITLE
+        polarion_name: Mixed authority showcase
+        polarion_title: Mixed authority showcase
         params:
-          physical_link: UUID #}
+          uuids:
+            - c8b78c78-5b11-4fc0-87b7-3ca84622efea # Aircraft
+            - d475ed7d-4644-4461-97d4-b52772c9b425 # Ground Operator
+            - 4890eae8-7a62-4d7b-bf8a-1590a199eebf # Cabin Crew
+            - 181a678c-dca9-46c1-9d18-b5a0c457c0de # Passenger
