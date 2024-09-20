@@ -54,7 +54,13 @@ sa:
   ComponentExchange:
     links:
       - allocated_functional_exchanges
-    serializer: add_context_diagram
+    serializer:
+      jinja_as_description:
+        template_folder: jinja/element_templates
+        template_path: component_exchange.html.j2
+      add_context_diagram:
+        filters:
+          - SHOW_EX_ITEMS
   FunctionalExchange:
     links:
       - exchange_items
@@ -139,7 +145,13 @@ pa:
       - exchange_items
       - polarion_role: physical_links
         capella_attr: allocating_physical_link
-    serializer: add_context_diagram
+    serializer:
+      jinja_as_description:
+        template_folder: jinja/element_templates
+        template_path: component_exchange.html.j2
+      add_context_diagram:
+        filters:
+          - SHOW_EX_ITEMS
   FunctionalExchange:
     links:
       - exchange_items
