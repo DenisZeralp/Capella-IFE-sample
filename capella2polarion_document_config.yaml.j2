@@ -44,6 +44,37 @@ full_authority:
         physical_link: {{ pl.uuid }}
     {%- endif -%}
     {% endfor %}
+  - template_directory: jinja/document_templates/logical-architecture
+    template: logical-component.html.j2
+    heading_numbering: True
+    work_item_layouts:
+      logicalComponent:
+        fields_at_start:
+          - id
+        fields_at_end:
+          - context_diagram
+          - allocated_functions
+      componentExchange:
+        fields_at_start:
+          - id
+        fields_at_end:
+          - context_diagram
+          - allocated_functional_exchanges
+          - exchange_items
+      class:
+        show_title: False
+        fields_at_end:
+          - tree_view
+      exchangeItem:
+        show_title: False
+    instances:
+    {%- for cmp in model.search("LogicalComponent") %}
+    - polarion_space: Logical Component Documents
+      polarion_name: {{ cmp.uuid }}
+      polarion_title: "{{ cmp.name | safe }}"
+      params:
+        uuid: {{ cmp.uuid }}
+    {% endfor %}
 {# mixed_authority:
   - template_directory: jinja/document_templates
     heading_numbering: True
