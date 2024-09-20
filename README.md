@@ -10,6 +10,10 @@ This repo contains the "In-Flight Entertainment System" sample model,
 originally maintained by the Capella developers at
 <https://github.com/eclipse-capella/capella/tree/master/samples/In-Flight%20Entertainment%20System>.
 
+Model complexity
+----------------
+![model complexity](./model-complexity-badge.svg)
+
 This repo also contains some adjustments to the model as well as additional
 configuration to showcase some features of
 [py-capellambse](https://github.com/DSD-DBS/py-capellambse).
