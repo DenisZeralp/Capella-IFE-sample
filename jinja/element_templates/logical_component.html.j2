@@ -1,0 +1,21 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
+{% from 'common_macros.html.j2' import show_other_attributes, description %}
+
+{{ description(object) | safe }}
+
+{%- for fnc in object.allocated_functions -%}
+    {%- if loop.first -%}
+        <h1>Allocated functions</h1>
+    {%- endif -%}
+
+    <h2>{{ fnc.name }}</h2>
+    {{ description(fnc) | safe }}
+{%- endfor -%}
+
+<p>
+The figure below provides an overview of the logical subsystem and external entities that either require the functionality of <b>{{ object.name }}</b> (expect outputs) or enable it (provide inputs). The figure also identifies the interfaces between the subsystem and its environment.
+</p>
