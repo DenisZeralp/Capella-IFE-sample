@@ -26,6 +26,25 @@
   Constraint:
     serializer: linked_text_as_description
 
+oa: # Specify below
+  OperationalCapability: # Capella Type with references
+    serializer: include_pre_and_post_condition
+    links:
+      - involved_activities # Specify workitem links
+      - involved_entities
+      - constraints
+  OperationalActivity: # Capella Type w/o references
+    links:
+      - inputs
+      - outputs
+  Entity:
+    polarion_type: operationalEntity
+    links:
+      - activities
+  FunctionalExchange:
+    polarion_type: operationalInteraction
+  CommunicationMean:
+
 sa:
   SystemComponent:
     - links:
