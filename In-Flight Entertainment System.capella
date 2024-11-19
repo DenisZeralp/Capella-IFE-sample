@@ -3245,6 +3245,28 @@
             name="Aircraft" abstractType="#c8b78c78-5b11-4fc0-87b7-3ca84622efea"/>
         <ownedParts xsi:type="org.polarsys.capella.core.data.cs:Part" id="213830fc-c679-44e9-89c2-73d5034d8029"
             name="Ground Operator" abstractType="#d475ed7d-4644-4461-97d4-b52772c9b425"/>
+        <ownedComponentExchanges xsi:type="org.polarsys.capella.core.data.fa:ComponentExchange"
+            id="b11a1c13-3d54-4a16-8816-f405646535b0" name="I_IFE_Crew" source="#c4751b7b-ac75-4943-b86b-98b2199c1ebf"
+            target="#dda759fb-dbe9-4a81-92dc-4bcaf5657ec6" kind="FLOW">
+          <ownedComponentExchangeFunctionalExchangeAllocations xsi:type="org.polarsys.capella.core.data.fa:ComponentExchangeFunctionalExchangeAllocation"
+              id="731b13b1-78de-45a2-b798-cb2dee2e4f4e" targetElement="#21e787ec-7763-4896-a0c6-421367c3561a"
+              sourceElement="#b11a1c13-3d54-4a16-8816-f405646535b0"/>
+          <ownedComponentExchangeFunctionalExchangeAllocations xsi:type="org.polarsys.capella.core.data.fa:ComponentExchangeFunctionalExchangeAllocation"
+              id="6822dd27-262c-4008-9c37-6712c8bf18d7" targetElement="#cc3abddf-d289-4461-925d-c4d962230954"
+              sourceElement="#b11a1c13-3d54-4a16-8816-f405646535b0"/>
+          <ownedComponentExchangeFunctionalExchangeAllocations xsi:type="org.polarsys.capella.core.data.fa:ComponentExchangeFunctionalExchangeAllocation"
+              id="c366e16f-61b2-4ab1-a0ab-438a0343e3c9" targetElement="#0bc7709d-62f9-4a1e-af23-b5a8a78ac19c"
+              sourceElement="#b11a1c13-3d54-4a16-8816-f405646535b0"/>
+          <ownedComponentExchangeFunctionalExchangeAllocations xsi:type="org.polarsys.capella.core.data.fa:ComponentExchangeFunctionalExchangeAllocation"
+              id="8dd83a09-353b-444b-a5ca-6b4f188b77e6" targetElement="#8aa8e222-d82c-4132-ac6d-9b5f8691a89e"
+              sourceElement="#b11a1c13-3d54-4a16-8816-f405646535b0"/>
+          <ownedComponentExchangeFunctionalExchangeAllocations xsi:type="org.polarsys.capella.core.data.fa:ComponentExchangeFunctionalExchangeAllocation"
+              id="58fbd2a2-b765-4deb-b40c-a7cd84f27d6b" targetElement="#b40bc1cf-4622-41ec-801f-1f37102f7ff9"
+              sourceElement="#b11a1c13-3d54-4a16-8816-f405646535b0"/>
+          <ownedComponentExchangeFunctionalExchangeAllocations xsi:type="org.polarsys.capella.core.data.fa:ComponentExchangeFunctionalExchangeAllocation"
+              id="8afd4694-25ce-4567-8a8b-9778d7974a7b" targetElement="#8016239b-3648-4d04-85d4-76305d740490"
+              sourceElement="#b11a1c13-3d54-4a16-8816-f405646535b0"/>
+        </ownedComponentExchanges>
         <ownedSystemComponents xsi:type="org.polarsys.capella.core.data.ctx:SystemComponent"
             id="e0a46739-7e50-4ea6-b198-0e5efb9ce68f" name="IFE System" summary="In-Flight Entertainment System"
             description="&lt;p>It is an overly simplified vision of what a real in-flight entertainment system is: &lt;a href=&quot;hlink://e0a46739-7e50-4ea6-b198-0e5efb9ce68f&quot;>IFE System&lt;/a>&lt;strong>&amp;nbsp;&lt;/strong>described as a&lt;strong> backbox&lt;/strong>, interacting with Actors:&lt;/p>&#xA;&#xA;&lt;ul>&#xA;&#x9;&lt;li>&lt;a href=&quot;hlink://181a678c-dca9-46c1-9d18-b5a0c457c0de&quot;>Passenger&lt;/a>&lt;/li>&#xA;&#x9;&lt;li>&lt;a href=&quot;hlink://4890eae8-7a62-4d7b-bf8a-1590a199eebf&quot;>Cabin Crew&lt;/a>&lt;/li>&#xA;&#x9;&lt;li>&lt;a href=&quot;hlink://c8b78c78-5b11-4fc0-87b7-3ca84622efea&quot;>Aircraft&lt;/a>&lt;/li>&#xA;&#x9;&lt;li>&lt;a href=&quot;hlink://d475ed7d-4644-4461-97d4-b52772c9b425&quot;>Ground Operator&lt;/a>&lt;/li>&#xA;&lt;/ul>&#xA;&#xA;&lt;p>&lt;span id=&quot;cke_bm_368C&quot; style=&quot;display: none;&quot;>&amp;nbsp;&lt;/span>The system is globally organized as follows:&lt;/p>&#xA;&#xA;&lt;ul>&#xA;&#x9;&lt;li>Cabin crew services are always available, passenger services have to be activated. Their availability depends on the flying conditions and on the class the passengers&lt;br />&#xA;&#x9;are flying in&lt;/li>&#xA;&#x9;&lt;li>The system is able to store digital media content&lt;/li>&#xA;&#x9;&lt;li>Most of the interactions of the passengers with their services (navigating between menus, selecting movies, etc.) are captured in functions called &amp;ldquo;Run &amp;lt;xxx&amp;gt; service&amp;rdquo;&lt;/li>&#xA;&#x9;&lt;li>Services rely on audio and video broadcast means&lt;/li>&#xA;&#x9;&lt;li>Maintenance and configuration topics are only evoked&lt;/li>&#xA;&lt;/ul>&#xA;&#xA;&lt;p>The &lt;a href=&quot;hlink://_Q3xl4JTyEeSgObsjQ4XNVQ/&quot;>&lt;font color=&quot;#0066cc&quot;>[MCB] All Missions and Capabilities&lt;/font>&lt;/a> diagram&amp;nbsp;shows on the capabilities of the IFE system. Three other diagrams provide interesting entry points to the model:&lt;/p>&#xA;&#xA;&lt;ul>&#xA;&#x9;&lt;li>&lt;a href=&quot;hlink://_LzrP8LclEd6PZMYM-Vvo5g/&quot;>&lt;font color=&quot;#0066cc&quot;>[SC] System Actors&lt;/font>&lt;/a>&amp;nbsp;lists all the Actors (the aircraft is considered as an actor)&lt;/li>&#xA;&#x9;&lt;li>&lt;a href=&quot;hlink://_gaN78KyfEeSJ1PX7slxG4w/&quot;>&lt;font color=&quot;#0066cc&quot;>[SDFB] Top Level Functional Overview&lt;/font>&lt;/a>&amp;nbsp;provides a first functional overview of what the actors actually do and what kind of exchanges they have with the IFE system&lt;/li>&#xA;&#x9;&lt;li>&lt;a href=&quot;hlink://_xXSwEKv6EeSTJvLsyJitsw/&quot;>&lt;font color=&quot;#0066cc&quot;>[SAB] Top Level System Overview&lt;/font>&lt;/a>&amp;nbsp;and its&amp;nbsp;slightly refined version &lt;a href=&quot;hlink://_TGdI0JZDEeS1n7CBuZtEDQ/&quot;>&lt;font color=&quot;#0066cc&quot;>[SAB] High Level System Overview&lt;/font>&lt;/a>&amp;nbsp;are &lt;strong>very good entry points to further navigate in the model&lt;/strong>.&lt;/li>&#xA;&lt;/ul>&#xA;&#xA;&lt;p>Starting from these high level diagrams,&amp;nbsp;a typical&amp;nbsp;reading path&amp;nbsp;is to dive into the function to visualize their refinement. For example, &lt;a href=&quot;hlink://_Z-lO8LC1EeSAOqSI-4duBg/&quot;>&lt;font color=&quot;#0066cc&quot;>[SDFB] [CTX] Run Services&lt;/font>&lt;/a>. And recursively.&lt;/p>&#xA;&#xA;&lt;p>&lt;strong>Using capabilities as a&amp;nbsp;driver to browse the model is recommended&lt;/strong>. Some diagrams are specifically marked for that purpose, for instance &lt;a href=&quot;hlink://_EsbcMLKzEeSZM9DbsSoyxw/&quot;>&lt;font color=&quot;#0066cc&quot;>[SDFB] [CAPABILITY] Provide Video Entertainment Services&lt;/font>&lt;/a>. From this capability covering VOD services to the passengers,&amp;nbsp;browse the functional chains and scenarios to better understand how the capability is fulfilled.&lt;/p>&#xA;&#xA;&lt;ul>&#xA;&#x9;&lt;li>Functional chains: &lt;a href=&quot;hlink://_MOb7kJjJEeSFKIU85IonOQ/&quot;>&lt;font color=&quot;#0066cc&quot;>[SFCD] Start Playing VOD Movie&lt;/font>&lt;/a>, &lt;a href=&quot;hlink://_m1AKgJjJEeSFKIU85IonOQ/&quot;>&lt;font color=&quot;#0066cc&quot;>[SFCD] Resume VOD Movie&lt;/font>&lt;/a>&lt;/li>&#xA;&#x9;&lt;li>Scenarios: &lt;a href=&quot;hlink://_CekP8JWHEeSAToX6gykiew/&quot;>&lt;font color=&quot;#0066cc&quot;>[ES] Start VOD Service&lt;/font>&lt;/a>, &lt;a href=&quot;hlink://_bkAKcLD-EeSk6sURco8jXw/&quot;>&lt;font color=&quot;#0066cc&quot;>[ES] Start Playing VOD Movie&lt;/font>&lt;/a>&lt;/li>&#xA;&lt;/ul>&#xA;&#xA;&lt;p>Check the global mode machine of the system with &lt;a href=&quot;hlink://_ZlrrsPhmEeyYD7A3qrV3tA&quot;>[MSM] IFE Operating Modes&lt;/a>. Among others, this mode machine is intended to specify under which operational conditions the IFE system is running. Another Mode machine is specifically modelled for what will become the Seat TV: &lt;a href=&quot;hlink://_ZHdlAPhuEeyYD7A3qrV3tA&quot;>[MSM] Seat TV - Movie Player Modes&lt;/a>&lt;/p>&#xA;&#xA;&lt;p>&lt;u>Notes:&lt;/u>&lt;/p>&#xA;&#xA;&lt;ol>&#xA;&#x9;&lt;li>Not all the IFE system is modelled. Focus is put on VOD service, audio announcement and imposed videos (safety instructions, ads, etc.).&lt;/li>&#xA;&#x9;&lt;li>While interesting, the topic of the integration of the IFE with the aircraft is kept minimal (according to flying conditions, the IFE system is supposed to behave&lt;br />&#xA;&#x9;differently).&lt;/li>&#xA;&#x9;&lt;li>Not all possible Scenarios and Functional Chains have been created.&lt;/li>&#xA;&lt;/ol>&#xA;&#xA;&lt;p>&amp;nbsp;&lt;/p>&#xA;"
@@ -3637,6 +3659,28 @@
                   triggers="#8016239b-3648-4d04-85d4-76305d740490"/>
             </ownedRegions>
           </ownedStateMachines>
+          <ownedFeatures xsi:type="org.polarsys.capella.core.data.fa:ComponentPort"
+              id="dda759fb-dbe9-4a81-92dc-4bcaf5657ec6" name="CP 1" orientation="INOUT"
+              kind="FLOW">
+            <ownedPortAllocations xsi:type="org.polarsys.capella.core.data.information:PortAllocation"
+                id="f53c84cd-662f-4f2c-9b2f-19f424d55f3b" targetElement="#6b424ace-11b0-48bc-ba7c-bcafc5f9aab5"
+                sourceElement="#dda759fb-dbe9-4a81-92dc-4bcaf5657ec6"/>
+            <ownedPortAllocations xsi:type="org.polarsys.capella.core.data.information:PortAllocation"
+                id="3e6f2e77-8847-4cac-8976-d23f1d0a7d04" targetElement="#8d242438-0eaa-4b1c-8988-39bbe145247b"
+                sourceElement="#dda759fb-dbe9-4a81-92dc-4bcaf5657ec6"/>
+            <ownedPortAllocations xsi:type="org.polarsys.capella.core.data.information:PortAllocation"
+                id="1c66cf64-588c-4778-b6c9-3ff6fa60cd1d" targetElement="#289c57c3-4817-4415-b497-0ab8f38ea658"
+                sourceElement="#dda759fb-dbe9-4a81-92dc-4bcaf5657ec6"/>
+            <ownedPortAllocations xsi:type="org.polarsys.capella.core.data.information:PortAllocation"
+                id="3990dfe3-283a-4593-816b-8953f76d8ef7" targetElement="#5c426ed8-e3b9-46b5-a715-01e91c821b92"
+                sourceElement="#dda759fb-dbe9-4a81-92dc-4bcaf5657ec6"/>
+            <ownedPortAllocations xsi:type="org.polarsys.capella.core.data.information:PortAllocation"
+                id="95d2792e-a039-44db-8673-9d0253862da4" targetElement="#482fd2b4-c5a6-4237-bf18-da83d0faeaac"
+                sourceElement="#dda759fb-dbe9-4a81-92dc-4bcaf5657ec6"/>
+            <ownedPortAllocations xsi:type="org.polarsys.capella.core.data.information:PortAllocation"
+                id="6ffbbb88-2a07-4eed-a2e7-6a0d8f230d32" targetElement="#8714bcd3-4245-404a-b610-c08d8acde400"
+                sourceElement="#dda759fb-dbe9-4a81-92dc-4bcaf5657ec6"/>
+          </ownedFeatures>
         </ownedSystemComponents>
         <ownedSystemComponents xsi:type="org.polarsys.capella.core.data.ctx:SystemComponent"
             id="181a678c-dca9-46c1-9d18-b5a0c457c0de" name="Passenger" summary=""
@@ -3669,6 +3713,28 @@
           <ownedFunctionalAllocation xsi:type="org.polarsys.capella.core.data.fa:ComponentFunctionalAllocation"
               id="2e172d8b-d26a-4c98-b86a-b9bd079f1836" targetElement="#64847aed-d627-4812-a2de-a5dd8d7ce573"
               sourceElement="#4890eae8-7a62-4d7b-bf8a-1590a199eebf"/>
+          <ownedFeatures xsi:type="org.polarsys.capella.core.data.fa:ComponentPort"
+              id="c4751b7b-ac75-4943-b86b-98b2199c1ebf" name="CP 1" orientation="INOUT"
+              kind="FLOW">
+            <ownedPortAllocations xsi:type="org.polarsys.capella.core.data.information:PortAllocation"
+                id="b2434fe9-fabb-4885-bc80-b4f9fabc6403" targetElement="#bd1fed2c-d331-4b92-9eed-ff5db97debff"
+                sourceElement="#c4751b7b-ac75-4943-b86b-98b2199c1ebf"/>
+            <ownedPortAllocations xsi:type="org.polarsys.capella.core.data.information:PortAllocation"
+                id="80d5dc05-e44d-459b-b589-10ab11dab033" targetElement="#9c0803a1-79f4-4d1d-a545-100f5b4bccc3"
+                sourceElement="#c4751b7b-ac75-4943-b86b-98b2199c1ebf"/>
+            <ownedPortAllocations xsi:type="org.polarsys.capella.core.data.information:PortAllocation"
+                id="3e6fc718-4196-4072-b776-625c8be185ea" targetElement="#76e1c0e5-3567-4094-b84d-779b35388d9a"
+                sourceElement="#c4751b7b-ac75-4943-b86b-98b2199c1ebf"/>
+            <ownedPortAllocations xsi:type="org.polarsys.capella.core.data.information:PortAllocation"
+                id="67685795-24ba-43fd-bc3f-6b797f8add1c" targetElement="#c9d13362-83c6-40d3-a7e5-10b7222a7cd9"
+                sourceElement="#c4751b7b-ac75-4943-b86b-98b2199c1ebf"/>
+            <ownedPortAllocations xsi:type="org.polarsys.capella.core.data.information:PortAllocation"
+                id="23acf81d-fdd8-4335-96f4-f170f3a7c20e" targetElement="#e0654cac-e572-4ad1-a077-297f7fbf499a"
+                sourceElement="#c4751b7b-ac75-4943-b86b-98b2199c1ebf"/>
+            <ownedPortAllocations xsi:type="org.polarsys.capella.core.data.information:PortAllocation"
+                id="51fa6eb3-c971-4b61-87b8-eb816fa57efd" targetElement="#da43a1c4-67b6-4082-971b-4efe8559539c"
+                sourceElement="#c4751b7b-ac75-4943-b86b-98b2199c1ebf"/>
+          </ownedFeatures>
           <ownedComponentRealizations xsi:type="org.polarsys.capella.core.data.cs:ComponentRealization"
               id="8c7c2a74-86f4-41f6-87c3-f281295f5e87" targetElement="#87bfb1b6-b85e-4497-950d-663dd78c4502"
               sourceElement="#4890eae8-7a62-4d7b-bf8a-1590a199eebf"/>
