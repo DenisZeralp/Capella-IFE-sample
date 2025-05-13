@@ -77,6 +77,55 @@ full_authority:
       params:
         uuid: {{ cmp.uuid }}
     {% endfor %}
+  - template_directory: jinja/document_templates/logical-architecture
+    template: logical-interface.html.j2
+    heading_numbering: True
+    work_item_layouts:
+      logicalComponent:
+        fields_at_start:
+          - id
+        fields_at_end:
+          - context_diagram
+      logicalActor:
+        fields_at_start:
+          - id
+        fields_at_end:
+          - context_diagram
+      componentExchange:
+        fields_at_start:
+          - id
+      logicalFunction:
+        fields_at_start:
+          - id
+      functionalExchange:
+        fields_at_start:
+          - id
+      exchangeItem:
+        show_title: False
+      class:
+        fields_at_start:
+          - id
+        fields_at_end:
+          - tree_view
+      capabilityRealization:
+        fields_at_start:
+          - id
+      functionalChain:
+        fields_at_start:
+          - id
+        fields_at_end:
+          - children
+      constraint:
+        fields_at_start:
+          - id
+    instances:
+    {%- for interface in model.la.all_component_exchanges %}
+      - polarion_space: Logical interfaces
+        polarion_name: {{ interface.uuid }}
+        polarion_title: "{{ interface.name | safe }}"
+        params:
+          uuid: {{ interface.uuid }}
+    {% endfor %}
 
 mixed_authority:
   - template_directory: jinja/document_templates/logical-architecture

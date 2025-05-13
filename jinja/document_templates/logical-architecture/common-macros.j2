@@ -1,0 +1,600 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
+{% from 'polarion_props.j2' import table_attributes, th_attributes, td_attributes %}
+
+{% macro first_upper(text) %}
+    {{ text[0] | upper}}{{text[1:] }}
+{% endmacro %}
+
+{% macro req_rels(rels) %}
+{% if rels %}
+<ul>
+{% for rel in rels %}
+    <li>
+        {{rel.type.long_name }} {{ rel.target.__class__.__name__ }} {{ rel.target | link_work_item }}
+    </li>
+{% endfor %}
+</ul>
+{% else %}
+<p style="color: red;">Not linked to any model objects</p>
+{% endif %}
+{% endmacro %}
+
+{% macro description(obj) %}
+    {% if obj.description %}
+        <p>{{ obj.description | safe }}</p>
+    {% else %}
+        <p style="color:red">No description available.</p>
+    {% endif %}
+{% endmacro %}
+
+{%- macro typed_name(object) -%}<b>{{ object.__class__.__name__ }}</b>{{ object.name  | trim }}{%- endmacro -%}
+
+{%- macro linked_name(object) -%}{{ object | link_work_item if object else "NONE" }}{%- endmacro -%}
+
+{%- macro display_traceability(object, complain=False) -%}
+  {%- set realized_attrs = [] -%}
+  {%- set realizing_attrs = [] -%}
+  {%- for attr in object.__dir__() -%}
+      {%- if attr.startswith("realized_") -%}
+          {% set _none = realized_attrs.append(attr) %}
+      {%- elif attr.startswith("realizing_") -%}
+          {% set _none = realizing_attrs.append(attr) %}
+      {%- endif-%}
+  {%- endfor -%}
+  {%- set realized_objects = object[realized_attrs | first] if realized_attrs else None -%}
+  {%- set realizing_objects = object[realizing_attrs | first] if realizing_attrs else None -%}
+
+  <b>Traceability</b>
+  <p>The figure below provides an overview of objects that "{{ object.name}}" realizes but also those that realize "{{ object.name }}"</p>
+  {{ object.realization_view.as_svg | safe }}
+  {% if realized_objects %}
+  <p>{{ object.name }} realizes the following objects:<p>
+  <ul>
+  {%- for obj in realized_objects -%}<li>{{ linked_name(obj) | safe}}</li>{%- endfor -%}
+  </ul>
+  {%- else -%}
+      <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to realize any object</p>
+  {%- endif -%}
+  {% if realizing_objects %}
+  <p>{{ object.name }} is realized by the following objects:</p>
+  <ul>
+  {%- for obj in realizing_objects -%}<li>{{ linked_name(obj) | safe}}</li>{%- endfor -%}
+  </ul>
+  {%- else -%}
+      <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to be realized by any object</p>
+  {% endif %}
+{%- endmacro -%}
+
+{% macro display_property_values(object, session, heading="Property Value Packages") %}
+  {%- if object.property_value_groups  -%}
+    {% set prefixes = [] %}
+    {% for group in object.property_value_groups %}
+      {% set prefix = group.name.split('.')[0] %}
+      {% if prefix not in prefixes %}
+        {% set _ = prefixes.append(prefix) %}
+      {% endif %}
+    {% endfor %}
+    {%- for prefix in prefixes -%}
+      {{ heading(2, prefix, session) }}
+      {%- for group in object.property_value_groups -%}
+        {% set parts = group.name.split('.') %}
+        {% if parts[0] == prefix %}
+          {{ heading(4, parts[1], session) }}
+          <table class="polarion-Document-table" style="margin: auto;margin-left: 0px;empty-cells: show;border-collapse: collapse;max-width: 1280px;border: 1px solid #CCCCCC;">
+            <thead>
+              <tr>
+                <th {{ th_attributes }}><b>Property</b></th>
+                <th {{ th_attributes }}><b>Value</b></th>
+              </tr>
+            </thead>
+            <tbody>
+              {%- for prop in group.property_values -%}
+                {% set prop_def = prop.applied_property_values | first %}
+                {% set unit_def = prop_def.property_values
+                  | selectattr("name", "equalto", "__UNIT__")
+                  | first if prop_def else None
+                %}
+                {% set unit = unit_def.value if unit_def else "" %}
+                <tr>
+                  <td {{ td_attributes }}>{{ linked_name(prop) | safe }}</td>
+                  <td {{ td_attributes }}>
+                    {{ prop.value.name if prop.value.name else prop.value }}
+                    {{ unit }}
+                  </td>
+                </tr>
+              {%- endfor -%}
+            </tbody>
+          </table>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endfor -%}
+  {%- endif -%}
+{% endmacro %}
+
+{% macro display_property_label(object, property, link_property=False) %}
+    <p>
+        {% if link_property %}
+            <b>{{ linked_name(property) | safe }}</b> :
+        {% else %}
+            <b>{{ property.name }}</b> :
+        {% endif %}
+        {% set type = None %}
+        {% if "type" in property.__dir__() %}
+            {% set type = property.type %}
+        {% elif "abstract_type" in property.__dir__() %}
+            {% set type = property.abstract_type %}
+        {% endif %}
+        {% if type %}
+            {% if type.__class__.__name__ == "Enumeration" %}
+                {{ type.name | safe }}
+                {%- if type.domain_type -%}
+                    <span> ({{type.domain_type.name | safe }})</span>
+                {%- else -%}
+                    <span style="color:red"> (Missing domain type)</span>
+                {%- endif -%}
+            {% else %}
+                {{ linked_name(type) | safe }}
+            {% endif %}
+        {% else %}
+            <span style="color:red">No type defined</span>
+        {% endif %}
+        {% if property.min_card.value == property.max_card.value and property.max_card.value == "1" %}
+        {% elif property.min_card.value == property.max_card.value %}
+        [ {{ property.min_card.value }} ]
+        {% else %}
+        [ {{ property.min_card.value }} .. {{ property.max_card.value }} ]
+        {% endif %}
+        {% if property.parent != object %}
+        (inherited from {{ linked_name(property.parent) | safe }})
+        {% endif %}
+    </p>
+{% endmacro %}
+
+{# Macros for System Definition #}
+{% macro render_capability_section(object, capabilities) %}
+  {% for cap in capabilities %}
+    {%- if loop.first -%}
+    <workitem id="cap-{{ cap.uuid }}">
+        <p>
+            This chapter provides an overview of the capabilities that
+            <i>{{ object.name }}</i> enables.
+        </p>
+    </workitem>
+    {%- endif -%}
+
+    {{ heading(3, cap.name, session) }}
+    {{ cap.description }}
+
+    {%- if cap.precondition -%}
+    <workitem id="cap-pre-condition-{{ cap.uuid }}">
+      <p>
+        <b>Pre-condition</b>:
+        {{ cap.precondition.specification['capella:linkedText'] |safe }}
+      </p>
+    </workitem>
+    {%- else -%}
+    <workitem id="cap-pre-condition-{{ cap.uuid }}">
+      <p><span style="color:red">No pre-condition defined for {{ cap.name }}</span></p>
+    </workitem>
+    {%- endif -%}
+
+    {%- if cap.postcondition -%}
+    <workitem id="cap-post-condition-{{ cap.uuid }}">
+      <p>
+        <b>Post-condition</b>:
+        {{ cap.postcondition.specification['capella:linkedText'] |safe }}
+      </p>
+    </workitem>
+    {%- else -%}
+    <workitem id="cap-post-condition-{{ cap.uuid }}">
+      <p><span style="color:red">No post-condition defined for {{ cap.name }}</span></p>
+      </workitem>
+    {%- endif -%}
+  {% else %}
+  <workitem id="no-cap">
+    <p><span style="color:red">{{ object.name }} is not involved in any Capability.</span></p>
+  </workitem>
+  {% endfor %}
+{% endmacro %}
+
+{% macro render_involved_actors_section(object, actors, capabilities, session) %}
+  {% for actor in actors %}
+    {% if loop.first %}
+    <workitem id="actor-{{ actor.uuid }}">
+        <p>The <i>{{ object.name }}</i> interacts with the actors described below.</p>
+    </workitem>
+    {% endif %}
+
+    {{ heading(3, actor.name, session) }}
+    <workitem id="actor-generic-{{ actor.uuid }}">
+      <p>{{ actor.description }}</p>
+
+      {%- set involving_caps = [] -%}
+      {%- for cap in capabilities -%}
+        {%- if actor in cap.involved_components -%}
+          {%- set _ = involving_caps.append(cap) -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {% if involving_caps %}
+        <p>
+          <i>{{ actor.name }}</i> is involved in the following capabilities:
+          {%- for cap in involving_caps -%}
+            {{ cap | link_work_item }}
+            {% if not loop.last %}, {% endif %}
+          {%- endfor -%}
+        </p>
+      {% endif %}
+
+      {% set related_src_exchanges = actor.related_exchanges | selectattr("source.owner", "equalto", object) | list %}
+      {% set related_tgt_exchanges = actor.related_exchanges | selectattr("target.owner", "equalto", object) | list %}
+      {% set related_exchanges = related_src_exchanges + related_tgt_exchanges %}
+
+      {% if related_exchanges %}
+        <p>
+          The <i>{{ object.name }}</i> interacts with the <i>{{ actor.name }}</i> via the following interfaces:
+        </p>
+        <ul>
+          {%- for exchange in related_exchanges -%}
+            <li>{{ exchange | link_work_item }}</li>
+          {%- endfor -%}
+        </ul>
+
+      {% else %}
+        <p><span style="color:red">No interfaces defined between {{ object.name }} and the actor.</span></p>
+      {% endif %}
+    </workitem>
+  {% else %}
+    <workitem id="no-actors">
+      <p><span style="color:red">No actors defined for {{ object.name }}.</span></span></p>
+    </workitem>
+  {% endfor %}
+{% endmacro %}
+
+{% macro render_allocated_functions(object, session) %}
+  {% macro functional_exchanges_table(exchange_col_label, owner_col_lable, exchanges, owner_decorator) %}
+    <table {{table_attributes}}>
+      <thead >
+        <tr>
+          <th {{th_attributes}}>ID</th>
+          <th {{th_attributes}}>{{ exchange_col_label }}</th>
+          <th {{th_attributes}}>{{ owner_col_lable }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {%- for exchange in exchanges -%}
+          <tr>
+            <td {{td_attributes}}>{{ exchange.uuid[:5] | upper }}</td>
+            <td {{td_attributes}}>{{ exchange | link_work_item }}</td>
+            <td {{td_attributes}}>{{ owner_decorator(exchange) }}</td>
+          </tr>
+        {%- endfor -%}
+      </tbody>
+    </table>
+  {% endmacro %}
+
+  {% macro decorate_own_source(exchange) %}
+    {{ exchange.source.owner | link_work_item }} (own function)
+  {% endmacro %}
+
+  {% macro decorate_actor_source(exchange) %}
+    {{ exchange.source.owner | link_work_item }}, a function of {{ exchange.source.owner.owner | link_work_item }}
+  {% endmacro %}
+
+  {% macro decorate_actor_target(exchange) %}
+    {{ exchange.target.owner | link_work_item }}, a function of {{ exchange.target.owner.owner | link_work_item }}
+  {% endmacro %}
+
+  {% macro decorate_own_target(exchange) %}
+    {{ exchange.target.owner | link_work_item }} (own function)
+  {% endmacro %}
+
+  {% for function in object.allocated_functions %}
+      {%- if loop.first -%}
+        <workitem id="function-{{ function.uuid }}"><p>This chapter defines the functions of {{ object.name }}</p></workitem>
+      {%- endif -%}
+
+      {{ heading(3, function.name, session) }}
+      <workitem id="description-{{ function.uuid }}">{{ description(function) }}</workitem>
+
+      {# Classify Functional IO #}
+      {%- set internal_inputs = [] -%}
+      {%- set external_inputs = [] -%}
+      {%- set undefined_owner_inputs = [] -%}
+      {%- set input_ports_with_no_exchanges = [] -%}
+      {%- set internal_outputs = [] -%}
+      {%- set external_outputs = [] -%}
+      {%- set undefined_owner_outputs = [] -%}
+      {%- set output_ports_with_no_exchanges = [] -%}
+
+      {%- if function.inputs -%}
+        {%- for input in function.inputs -%}
+          {%- if input.exchanges -%}
+            {%- for exchange in input.exchanges -%}
+              {%- set partner = exchange.source.owner.owner -%}
+              {%- if partner and partner != object -%}
+                {%- set none_ = external_inputs.append(exchange) -%}
+              {%- elif partner == object -%}
+                {%- set none_ = internal_inputs.append(exchange) -%}
+              {%- else -%}
+                {%- set none_ = undefined_owner_inputs.append(exchange) -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- else -%}
+            {%- set none_ = input_ports_with_no_exchanges.append(input) -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+
+      {%- if function.outputs -%}
+        {%- for output in function.outputs -%}
+          {%- if output.exchanges -%}
+            {%- for exchange in output.exchanges -%}
+              {%- set partner = exchange.target.owner.owner -%}
+              {%- if partner and partner != object -%}
+                {%- set none_ = external_outputs.append(exchange) -%}
+              {%- elif partner == object -%}
+                {%- set none_ = internal_outputs.append(exchange) -%}
+              {%- else -%}
+                {%- set none_ = undefined_owner_outputs.append(exchange) -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- else -%}
+            {%- set none_ = output_ports_with_no_exchanges.append(output) -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+
+      {# Visualize Functional IO #}
+
+      {% if function.inputs %}
+        {{ heading(4, "Inputs", session) }}
+        <workitem id="inputs-{{ function.uuid }}">
+        <p>The function <i>{{ function.name }}</i> may need the following inputs:</p>
+
+        {% if external_inputs %}
+          <p><b>Inputs from activities of external actors:</b></p>
+          {{ functional_exchanges_table("Input", "Source", external_inputs, decorate_actor_source) }}
+        {% endif %}
+
+        {% if internal_inputs %}
+          <p><b>Inputs from internal activities of {{ object.name }}</b></p>
+          <p>To <i>{{ function.name }}</i> {{ object.name }} may need:</p>
+          {{ functional_exchanges_table("Input", "Source", internal_inputs, decorate_own_source) }}
+        {% endif %}
+
+        {% if undefined_owner_inputs %}
+          <p><span style="color:red">The following exchanges come from functions that are not allocated to any entity:</span></p>
+          <ul>
+            {%- for exchange in undefined_owner_inputs -%}
+              <li>{{ exchange | link_work_item }}, an output of {{ exchange.source.owner | link_work_item }}</li>
+            {%- endfor -%}
+          </ul>
+        {% endif %}
+
+        {% if input_ports_with_no_exchanges %}
+          <p><span style="color:red">The following input ports have no incoming exchanges defined:</span></p>
+          <ul>
+            {%- for port in input_ports_with_no_exchanges -%}
+              <li>{{ linked_name(port) }}</li>
+            {%- endfor -%}
+          </ul>
+        {% endif %}
+        </workitem>
+      {% else %}
+      <workitem id="inputs-{{ function.uuid }}">
+        <p><span style="color:red">{{ object.name }} seems to require no inputs to {{ function.name }}.</span></p>
+      </workitem>
+      {% endif %}
+
+      {% if function.outputs %}
+        {{ heading(4, "Outputs", session) }}
+        <workitem id="outputs-{{ function.uuid }}">
+        <p>The function <i>{{ function.name }}</i> may produce the following outputs:</p>
+
+        {% if external_outputs %}
+          <p><b>Outputs to activities of external actors:</b></p>
+          {{ functional_exchanges_table("Output", "Target", external_outputs, decorate_actor_target) }}
+        {% endif %}
+
+        {% if internal_outputs %}
+          <p><b>Outputs to internal activities of {{ object.name }}</b></p>
+          <p>From <i>{{ function.name }}</i> {{ object.name }} may produce:</p>
+          {{ functional_exchanges_table("Output", "Target", internal_outputs, decorate_own_target) }}
+        {% endif %}
+
+        {% if undefined_owner_outputs %}
+          <p><span style="color:red">The following exchanges go to functions that are not allocated to any entity:</span></p>
+          <ul>
+            {%- for exchange in undefined_owner_outputs -%}
+              <li>{{ exchange | link_work_item }}, an input of {{ exchange.target.owner | link_work_item }}</li>
+            {%- endfor -%}
+          </ul>
+        {% endif %}
+
+        {% if output_ports_with_no_exchanges %}
+          <p><span style="color:red">The following output ports have no outgoing exchanges defined:</span></p>
+          <ul>
+            {%- for port in output_ports_with_no_exchanges -%}
+              <li>{{ port | link_work_item }}</li>
+            {%- endfor -%}
+          </ul>
+        {% endif %}
+        </workitem>
+      {% else %}
+      <workitem id="outputs-{{ function.uuid }}">
+        <p><span style="color:red">{{ object.name }} seems to produce no outputs from {{ function.name }}.</span></p>
+      </workitem>
+      {% endif %}
+
+      {% if not function.inputs and not function.outputs %}
+        <workitem id="no-in-outputs-{{ function.uuid }}">
+        <p><span style="color:red">{{ object.name }} seem to require no inputs and provide no outputs while performing "{{ function.name }}" which doesn't seem correct. A function should consume inputs and produce observable outputs unless it is a source or sink function.</span></p>
+        </workitem>
+      {% endif %}
+
+      {% if function.involved_in %}
+      <workitem id="involved-{{ function.uuid }}">
+        <p>While performing <i>{{ function.name }}</i>, <i>{{ object.name }}</i> contributes to the following capabilities:
+          {%- for cap in function.involved_in -%}
+            {{ cap | link_work_item }}
+            {% if not loop.last %}, {% endif %}
+          {%- endfor -%}
+        </p>
+      </workitem>
+    {% endif %}
+  {% else %}
+    <workitem id="no-functions">
+      <p><span style="color:red">No functions allocated to {{ object.name }}.</span></p>
+    </workitem>
+  {% endfor %}
+{% endmacro %}
+
+{% macro describe_exchange_direction(source, target, interface, exchanges) %}
+  <workitem id="{{ source.uuid }}-{{ target.uuid }}">
+    <p>
+      {%- set unique_exchange_names = [] -%}
+      {{ linked_name(source) | safe }}
+      should provide&nbsp;
+      {%- for fex in exchanges -%}
+        {%- if fex.name not in unique_exchange_names -%}
+          {{ fex.name }}
+          {%- if not loop.last -%}
+            ,
+          {%- else -%}
+          {% endif %}
+          {%- set _none = unique_exchange_names.append(fex.name) -%}
+        {%- endif -%}
+      {% endfor %}
+      via <i>{{ interface.name }}</i> interface (component exchange) so that
+      {{ linked_name(target) | safe }} could&nbsp;
+      {%- for fnc in exchanges | map(attribute='target.owner') | unique(attribute="uuid") -%}
+        {{ linked_name(fnc) | safe }}
+        {%- if not loop.last -%}
+          ,
+        {% else -%}
+          .
+        {%- endif -%}
+      {%- endfor -%}
+    </p>
+  </workitem>
+{% endmacro %}
+
+{% macro render_interface_description(object) %}
+  {% set source_provides = [] %}
+  {% set target_provides = [] %}
+  {%- for fex in object.allocated_functional_exchanges -%}
+    {%- if fex.source.owner and fex.source.owner.owner and fex.source.owner.owner == object.source.owner -%}
+      {%- set _none = source_provides.append(fex) -%}
+    {% else %}
+      {%- set _none = target_provides.append(fex) -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {% if source_provides %}
+    {{ describe_exchange_direction(object.source.owner, object.target.owner, object, source_provides) | safe }}
+  {% endif %}
+
+  {% if target_provides %}
+    {{ describe_exchange_direction(object.target.owner, object.source.owner, object, target_provides) | safe }}
+  {% endif %}
+{% endmacro %}
+
+{% macro render_interfaces_section(object, interfaces, exchange_items_catalog, session) %}
+  {% macro describe_exchange(object) %}
+    {% set source_function = object.source.owner %}
+    {% set target_function = object.target.owner %}
+    {% set source = source_function.owner %}
+    {% set target = target_function.owner %}
+    The {{ linked_name(source) | safe }} shall provide
+    {{ linked_name(object) | safe }} to {{ linked_name(target) | safe }}
+    so that the {{ target.name | safe if target else "NO NAME" }} could
+    {{ linked_name(target_function) | safe }}.
+  {% endmacro %}
+
+  {% for interface in interfaces %}
+      {%- if loop.first -%}
+        <workitem id="interface-{{ interface.uuid }}">
+        <p>This chapter describes the interfaces between {{ object.name }} and the actors.</p>
+        </workitem>
+      {%- endif -%}
+
+      {{ heading(3, interface.name, session) }}
+      {{ insert_work_item(interface, session) }}
+
+      {% if interface.allocated_functional_exchanges %}
+        <workitem id="interface-allocfextable-{{ interface.uuid }}">
+          <p>The interface may be used for the following functional interactions:</p>
+          <table {{table_attributes}}>
+            <thead>
+              <tr>
+                <th {{th_attributes}}>ID</th>
+                <th {{th_attributes}}>Interaction description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for exchange in interface.allocated_functional_exchanges %}
+                <tr>
+                  <td {{td_attributes}}>{{ "LEXC-" + exchange.uuid[:5] | upper }}</td>
+                  <td {{td_attributes}}>
+                    {{ describe_exchange(exchange) }}
+                    {% if exchange.exchange_items %}
+                      {% if exchange.exchange_items | length > 1 %}
+                        <p>{{ exchange.name }} is further specified via the following Exchange Items:</p>
+                        <ul>
+                          {% for item in exchange.exchange_items %}
+                            <li>{{ linked_name(item) | safe }}</li>
+                            {% if item not in exchange_items_catalog %}
+                              {% set _ = exchange_items_catalog.append(item) %}
+                            {% endif %}
+                          {% endfor %}
+                        </ul>
+                      {% else %}
+                        <p>This interaction is further specified via {{ exchange.exchange_items[0] | link_work_item }} Exchange Item</p>
+                      {% endif %}
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+      {% else %}
+          <p><span style="color:red">No exchanges defined for the interface.</span></p>
+      {% endif %}
+        </workitem>
+  {% else %}
+    <workitem id="no-interfaces">
+      <p><span style="color:red">No interfaces defined for {{ object.name }}</span></p>
+    </workitem>
+  {% endfor %}
+{% endmacro %}
+
+{% macro render_exchange_items_catalog(exchange_items_catalog, session) %}
+  <p>
+    The following items (e.g. energy, material, information) are exchanged
+    through the interactions with its interface partners.
+  </p>
+  {% for item in exchange_items_catalog %}
+    {{ heading(3, "A." + loop.index + item.name, session) }}
+    {%- if item.description -%}
+      {{ item.description | safe }}
+    {%- endif -%}
+    {%- if item.elements -%}
+      {{ heading(4, "Composition", session) }}
+      <workitem id="{{ item.uuid }}">
+      <p>
+        The exchange item "{{ item.name }}" is composed of the following elements:
+      </p>
+      <ul>
+        {%- for element in item.elements -%}
+          <li>{{ display_property_label(item, element) | safe }}</li>
+        {%- endfor -%}
+      </ul>
+      </workitem>
+    {% endif %}
+  {% endfor %}
+{% endmacro %}
