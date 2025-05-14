@@ -27,6 +27,7 @@
   {{ linked_name(target_function)| safe }}.
 {% endmacro %}
 
+{% set object = model.by_uuid(uuid) %}
 {{ heading(1, "Logical Interface " + object.name, session) }}
 <workitem id="uuid-field">
   <small style="color: #aaa">UUID: {{ object.uuid }}</small>
@@ -56,50 +57,8 @@
     The figure below provides an overview of the behaviors that depend on this
     interface:
   </p>
-  {{ object.context_diagram }}
-  <p>{{ object.name }} enables the following functional interactions:</p>
-  <table {{table_class_attribute}}>
-    <thead>
-      <tr>
-        <th {{th_attributes}}><b>ID</b></th>
-        <th {{th_attributes}}><b>Interaction description</b></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for exchange in object.allocated_functional_exchanges %}
-        <tr>
-          <td {{td_attributes}}>
-            <a href="{{ exchange | make_href }}"
-              >{{ "LEXC-" + exchange.uuid[:5] | upper }}</a
-            >
-          </td>
-          <td {{td_attributes}}>
-            {{ describe_exchange(exchange) | safe }}
-            {% if exchange.exchange_items %}
-              {% if exchange.exchange_items | length > 1 %}
-                <p>
-                  {{ exchange.name }} is further specified via the following
-                  Exchange Items:
-                </p>
-                <ul>
-                  {% for item in exchange.exchange_items %}
-                    <li>{{ linked_name(item) | safe }}</li>
-                  {% endfor %}
-                </ul>
-              {% else %}
-                <p>
-                  This interaction is further specified via
-                  {{ linked_name(exchange.exchange_items[0]) | safe }} Exchange
-                  Item
-                </p>
-              {% endif %}
-            {% endif %}
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
 </workitem>
+{{ insert_work_item(object, session) }}
 
 {% set fchains = object.allocated_functional_exchanges.map("involving_functional_chains") %}
 {%
@@ -117,16 +76,16 @@
   </workitem>
   {%- set fchain_involved_capabiilities = {} -%}
   {%- for fchain in fchains -%}
-    {{ heading(3, "Functional Chain " + fchain.name, session) }}
-    <workitem id="{{fchain.uuid}}">{{ linked_name(fchain) | safe }}</workitem>
+    {{ heading(3, fchain.name, session) }}
+    {{ insert_work_item(fchain, session) | safe }}
     {%- set involved_caps = model.search("CapabilityRealization").by_involved_chains(fchain) -%}
     {%- if involved_caps -%}
       {{ heading(4, "Involving capabilities", session) }}
       <workitem id="{{fchain.uuid}}-capabilities">
         <ul>
-          {%- for cap in involved_caps -%}
-            <li>{{ linked_name(cap) | safe }}</li>
-          {%- endfor -%}
+        {%- for cap in involved_caps -%}
+          <li>{{ linked_name(cap) | safe }}</li>
+        {%- endfor -%}
         </ul>
       </workitem>
     {%- endif -%}
@@ -143,20 +102,20 @@
           <tr>
             <td {{td_attributes}}>
               <ul>
-                {%- for fnc in fchain.involved_functions -%}
-                  {%- if fnc.uuid in allocated_functions | map(attribute="uuid") -%}
-                    <li>{{ linked_name(fnc) | safe }}</li>
-                  {%- endif -%}
-                {%- endfor -%}
+              {%- for fnc in fchain.involved_functions -%}
+                {%- if fnc.uuid in allocated_functions | map(attribute="uuid") -%}
+                  <li>{{ linked_name(fnc) | safe }}</li>
+                {%- endif -%}
+              {%- endfor -%}
               </ul>
             </td>
             <td {{td_attributes}}>
               <ul>
-                {%- for link in fchain.involved_links -%}
-                  {%- if link.uuid in object.allocated_functional_exchanges | map(attribute="uuid") -%}
-                    <li>{{ linked_name(link) | safe }}</li>
-                  {%- endif -%}
-                {%- endfor -%}
+              {%- for link in fchain.involved_links -%}
+                {%- if link.uuid in object.allocated_functional_exchanges | map(attribute="uuid") -%}
+                  <li>{{ linked_name(link) | safe }}</li>
+                {%- endif -%}
+              {%- endfor -%}
               </ul>
             </td>
           </tr>
@@ -170,19 +129,21 @@
   {{ heading(2, "Constraints", session) }}
   <workitem id="constraints">
     <ul>
-      {%- for constraint in object.constraints -%}
-        <li>
-          <b>{{ linked_name(constraint) | safe }}</b>:
-          {{ constraint.specification["capella:linkedText"] | safe }}
-        </li>
-      {%- endfor -%}
+    {%- for constraint in object.constraints -%}
+      <li>
+        <b>{{ linked_name(constraint) | safe }}</b>:
+        {{ constraint.specification["capella:linkedText"] | safe }}
+      </li>
+    {%- endfor -%}
     </ul>
   </workitem>
 {%- endif %}
 
+{%- if object.property_value_groups  -%}
 <workitem id="additional-properties">
   {{ display_property_values(object, session, heading="Additional properties") | safe }}
 </workitem>
+{%- endif %}
 
 <workitem id="traceability">
   {{ display_traceability(object) | safe }}

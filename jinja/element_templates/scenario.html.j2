@@ -1,0 +1,11 @@
+{% from 'common_macros.html.j2' import description %}
+
+{{ description(object) | safe }}
+
+{% if object.diagrams %}
+{% set diagram = object.diagrams[0] %}
+{% if work_item -%}
+<p>The figure below provides an overview of <i>{{ object.name }}</i>.</p>
+{{ insert_diagram(work_item, diagram, "diagram", max_width=750) }}
+{% endif %}
+{% endif %}

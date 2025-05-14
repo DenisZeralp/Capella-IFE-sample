@@ -3,7 +3,7 @@
     SPDX-License-Identifier: Apache-2.0
 #}
 
-{% from 'polarion_props.j2' import table_attributes, th_attributes, td_attributes %}
+{% from 'polarion-props.j2' import table_attributes, th_attributes, td_attributes %}
 
 {% macro first_upper(text) %}
     {{ text[0] | upper}}{{text[1:] }}
@@ -49,24 +49,26 @@
   {%- set realizing_objects = object[realizing_attrs | first] if realizing_attrs else None -%}
 
   <b>Traceability</b>
-  <p>The figure below provides an overview of objects that "{{ object.name}}" realizes but also those that realize "{{ object.name }}"</p>
-  {{ object.realization_view.as_svg | safe }}
-  {% if realized_objects %}
-  <p>{{ object.name }} realizes the following objects:<p>
-  <ul>
-  {%- for obj in realized_objects -%}<li>{{ linked_name(obj) | safe}}</li>{%- endfor -%}
-  </ul>
-  {%- else -%}
-      <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to realize any object</p>
+  {%- if object.realization_view -%}
+    <p>The figure below provides an overview of objects that "{{ object.name}}" realizes but also those that realize "{{ object.name }}"</p>
+    {{ object.realization_view.as_svg | safe }}
   {%- endif -%}
-  {% if realizing_objects %}
-  <p>{{ object.name }} is realized by the following objects:</p>
-  <ul>
-  {%- for obj in realizing_objects -%}<li>{{ linked_name(obj) | safe}}</li>{%- endfor -%}
-  </ul>
+  {%- if realized_objects -%}
+    <p>{{ object.name }} realizes the following objects:<p>
+    <ul>
+      {%- for obj in realized_objects -%}<li>{{ linked_name(obj) | safe}}</li>{%- endfor -%}
+    </ul>
   {%- else -%}
-      <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to be realized by any object</p>
-  {% endif %}
+    <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to realize any object</p>
+  {%- endif -%}
+  {%- if realizing_objects -%}
+    <p>{{ object.name }} is realized by the following objects:</p>
+    <ul>
+    {%- for obj in realizing_objects -%}<li>{{ linked_name(obj) | safe}}</li>{%- endfor -%}
+    </ul>
+  {%- else -%}
+    <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to be realized by any object</p>
+  {%- endif -%}
 {%- endmacro -%}
 
 {% macro display_property_values(object, session, heading="Property Value Packages") %}

@@ -25,6 +25,17 @@
         capella_attr: target
   Constraint:
     serializer: linked_text_as_description
+  FunctionalChain:
+    polarion_type: functionalChain
+    serializer:
+      include_pre_and_post_condition:
+      jinja_as_description:
+        template_folder: jinja/element_templates
+        template_path: scenario.html.j2
+    links:
+      - polarion_role: involves
+        capella_attr: involved_functions
+        link_field: involved_functions
 
 oa: # Specify below
   OperationalCapability: # Capella Type with references
@@ -94,12 +105,6 @@ sa:
     links:
       - involved_functions
       - constraints
-  FunctionalChain:
-    polarion_type: functionalChain
-    links:
-      - polarion_role: involves
-        capella_attr: involved_functions
-        link_field: involved_functions
 
 la:
   LogicalComponent:
@@ -150,12 +155,6 @@ la:
     links:
       - exchange_items
   ExchangeItem:
-  FunctionalChain:
-    polarion_type: functionalChain
-    links:
-      - polarion_role: involves
-        capella_attr: involved_functions
-        link_field: involved_functions
 
 pa:
   ComponentExchange:

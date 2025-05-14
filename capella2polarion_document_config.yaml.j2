@@ -49,7 +49,7 @@ full_authority:
     {%- endif -%}
     {% endfor %}
   - template_directory: jinja/document_templates/logical-architecture
-    template: logical-component-full-authority.html.j2
+    template: logical-interface.html.j2
     heading_numbering: True
     work_item_layouts:
       logicalComponent:
@@ -114,7 +114,7 @@ full_authority:
         fields_at_start:
           - id
         fields_at_end:
-          - children
+          - parent_reverse
       constraint:
         fields_at_start:
           - id
