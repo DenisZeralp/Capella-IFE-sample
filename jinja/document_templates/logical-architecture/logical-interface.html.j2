@@ -74,7 +74,6 @@
       through involvements of functions and interactions.
     </p>
   </workitem>
-  {%- set fchain_involved_capabiilities = {} -%}
   {%- for fchain in fchains -%}
     {{ heading(3, fchain.name, session) }}
     {{ insert_work_item(fchain, session) | safe }}
